@@ -1,0 +1,4 @@
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function renderTechnicalExplanation(result){
+ return `<section class="technical-explanation" data-technical-state="${esc(result.state)}"><h4>技术面 · ${result.timeframe==='week'?'周线':'日线'}观察</h4><p class="sector-verdict">${esc(result.summary)}</p><dl>${[['趋势',result.trend.text],['动能',result.momentum.text],['量能',result.volume.text]].map(([name,text])=>`<div><dt>${name}</dt><dd>${esc(text)}</dd></div>`).join('')}</dl><details><summary>这些指标在说什么？</summary><p class="caption">均线是一段时间的平均收盘价，用来观察方向。MACD比较短期与较长期均价的差距；DIF是差值线，DEA是它的平滑线，上穿叫金叉，下穿叫死叉。零轴表示短期与长期均价的差值为零；负柱缩短表示下跌动能减弱，不等于价格已经上涨。成交量倍数是本次交易量除以前20个有效样本的平均交易量。</p></details><p class="caption">${esc(result.period)}${result.lastDate?` · 截至${esc(result.lastDate)}`:''}<br>${esc(result.weekly)}</p></section>`;
+}

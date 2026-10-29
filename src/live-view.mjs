@@ -1,0 +1,9 @@
+import {QUOTE_CATALOG,quoteState} from './live-quotes.mjs';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function renderLiveQuotes(bundle,status='idle',enabled=true,now=new Date().toISOString()){
+ return `<section id="live-market-quotes" class="live-quotes" data-loaded="${status!=='loading'}"><div class="card-heading"><h3>当天大盘报价</h3><div><button class="quiet" data-action="toggle-quotes">${enabled?'暂停自动刷新':'开启自动刷新'}</button><button class="secondary" data-action="refresh-quotes"${status==='loading'?' disabled':''}>${status==='loading'?'读取中…':'立即刷新'}</button></div></div><p class="caption">${enabled?'页面可见时每60秒读取':'已暂停自动读取'} · 公共报价延迟未知，以源时间为准。历史曲线仍使用完整收盘样本。</p>${status==='error'?'<p class="warning">当天公共报价暂不可用；请确认正在使用支持公共行情中转的本机服务。已有报价保留原时间。</p>':''}<div class="live-grid">${QUOTE_CATALOG.map(item=>{
+ const record=bundle?.records.find(r=>r.id===item.id),state=quoteState(record,now),hasPrice=record?.price!==null&&record?.price!==undefined;
+ const stamp=record?.asOf?new Intl.DateTimeFormat('sv-SE',{timeZone:item.timeZone,dateStyle:'short',timeStyle:'medium'}).format(new Date(record.asOf)):'无源时间';
+ return `<article><b>${esc(item.name)}</b>${hasPrice?`<div class="live-price">${record.price.toLocaleString('zh-CN',{maximumFractionDigits:2,minimumFractionDigits:2})}</div><p>${record.changePercent>=0?'+':''}${record.changePercent.toFixed(2)}% <small>较前收盘</small></p>`:'<p>暂无有效报价</p>'}<small>${esc(stamp)} · 北京时间<br>${!enabled||status==='error'?'已暂停或读取失败 · 保留观测':state==='latest'?'近期报价 · 延迟未知':state==='stale'?'报价过期（可能休市或延迟）':'来源不可用'}${record?.error?' · 获取失败，保留旧值':''}</small></article>`;
+ }).join('')}</div><p class="caption">来源：腾讯财经公共报价（本机审阅）。仅获取四项固定公共指数，不发送你的持仓；当前未覆盖港美股盘中报价。${bundle?`<br>本机取得时间：${esc(bundle.fetchedAt)}（UTC）；各指数源时间见上方。`:""}</p></section>`;
+}

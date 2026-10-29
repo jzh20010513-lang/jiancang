@@ -1,0 +1,9 @@
+import {formatDecimal} from './format.mjs';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function renderRiskProfile(profile){
+ return `<section class="card"><h2>我的风险与配置标准</h2><p class="caption">均可留空，仅留在此设备。亏损幅度是自定承受意愿，不是风险测评结果或止损线。</p><div class="form-grid"><label>可接受亏损幅度（%）<input id="risk-loss" inputmode="decimal" value="${esc(profile?.lossTolerancePercent??'')}" placeholder="0至100，最多两位小数"></label><label>预计用钱时间<input id="risk-need-by" type="date" value="${esc(profile?.needBy??'')}"></label><label>单板块配置上限（%）<input id="risk-sector-cap" inputmode="decimal" value="${esc(profile?.sectorCapPercent??'')}" placeholder="留空则不检查"></label></div><p class="caption">上限对照各板块关联产品占同币种已确认持仓的比例，并非真实行业敞口，分类可能重叠。未来365日内用钱会提示检查资金覆盖；各币种需要的金额仍在下方填写。</p></section>`;
+}
+export function renderGuidance(g,layout){
+ const mask=layout.mask;
+ return `<section class="sector-guidance" data-guidance="${mask?'masked':g.priority}"><h4>${mask?'个人配置建议已隐藏':esc(g.title)}</h4><p class="guidance-allocation"><b>我的配置：</b>${mask?'个人金额、比例与建议详情已隐藏':g.allocations.map(a=>`${esc(a.currency)} ${a.percent===null?'占比未知':a.percent.toFixed(2)+'%'}${a.overCap?' · 超过自定上限':''}`).join(' / ')||'暂无可计算的关联占比'}<small>分母：各币种全部已确认有效持仓</small></p><p class="guidance-action"><b>建议：</b>${mask?'关闭金额遮罩后查看个人配置建议。':esc(g.action)}</p><details><summary>查看个人标准与判断依据</summary><p>${mask?'个人标准已隐藏':esc(g.context)}</p>${!mask?g.allocations.filter(a=>a.scenarioLoss!==null).map(a=>`<p>${esc(a.currency)} 假设波动金额 ${esc(formatDecimal(a.scenarioLoss))}（该币种全部已确认持仓，不是本板块亏损预测）</p>`).join(''):''}<p><b>市场：</b>${esc(g.market)}</p><p><b>技术：</b>${esc(g.technical)}</p><p><b>情绪：</b>${esc(g.sentiment)}</p></details><p class="caption">${esc(g.caveat)}</p><button class="quiet" data-action="plan">调整风险与配置标准 →</button></section>`;
+}
