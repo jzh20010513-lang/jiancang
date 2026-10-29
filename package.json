@@ -12,7 +12,8 @@
     "test:browser": "node tests/browser.mjs",
     "test:ocr": "node tests/ocr-benchmark.mjs",
     "market:refresh": "node scripts/refresh-market.mjs",
-    "sectors:refresh": "node scripts/refresh-sectors.mjs"
+    "sectors:refresh": "node scripts/refresh-sectors.mjs",
+    "build:public": "node scripts/build-public.mjs"
   },
   "dependencies": {
     "@tesseract.js-data/chi_sim": "1.0.0",

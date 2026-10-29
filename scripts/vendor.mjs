@@ -16,5 +16,8 @@ for(const key of Object.keys(lock.packages).filter(k=>k.startsWith('node_modules
 }
 notices.push('Embedded worker notice: worker.min.js.LICENSE.txt\n'+await readFile(join(root,'node_modules/tesseract.js/dist/worker.min.js.LICENSE.txt'),'utf8'));
 for(const [name,file] of [['naptha/tessdata upstream - Apache-2.0','naptha-tessdata-APACHE-2.0.txt'],['tesseract-ocr/tessdata_best upstream - Apache-2.0','tessdata-best-APACHE-2.0.txt']])notices.push(name+'\n'+await readFile(join(root,'licenses',file),'utf8'));
+notices.push('This software is based in part on the work of the Independent JPEG Group.');
+const native=JSON.parse(await readFile(join(root,'licenses/native/sources.json'),'utf8'));
+for(const item of native.files)notices.push(`${item.name} - ${item.url}\n`+await readFile(join(root,'licenses/native',item.file),'utf8'));
 await writeFile(join(dest,'THIRD_PARTY.txt'),notices.join('\n\n----------------\n\n'));
 console.log('Local OCR assets prepared. No runtime CDN required.');

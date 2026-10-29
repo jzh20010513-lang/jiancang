@@ -21,3 +21,5 @@ secrets/
 Thumbs.db
 *.traineddata
 *.traineddata.gz
+
+out/

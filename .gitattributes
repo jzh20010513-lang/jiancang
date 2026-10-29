@@ -1,0 +1,3 @@
+
+# Preserve verbatim upstream license bytes, including original whitespace.
+licenses/native/*.txt -text -whitespace

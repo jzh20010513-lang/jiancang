@@ -11,4 +11,7 @@ test('vendor output preserves upstream model and embedded worker license notices
  assert.match(notice,/tesseract-ocr\/tessdata_best/);
  assert.match(notice,/regenerator-runtime/);
  assert.match(notice,/wasm-feature-detect/);
+ assert.match(notice,/Independent JPEG Group/);
+ assert.match(notice,/leptonica/);
+ assert.match(notice,/openlibm/);
 });

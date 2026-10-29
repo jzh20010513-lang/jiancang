@@ -26,7 +26,8 @@ const app=document.querySelector('#app'), persistence=createPersistence(browserD
 let snapshot=null,layout=defaultLayout(),draft=null,panel='',message='',busy=false,progress='',images=[],selectedImage=0,rawText='',preview=null,restoreLayout=null,isDemo=false,dirty=false;
 let filters={accountId:'',categoryId:'',tagId:'',query:''},importGeneration=0,imageLoading=false;
 let planning=defaultPlanning(),restorePlanning=null,draftMode='import',lastView='';
-let liveBundle=null,liveStatus='idle',liveEnabled=true,liveGeneration=0,liveController=null;
+const publicStatic=import.meta.env?.VITE_PUBLIC_STATIC==='true';
+let liveBundle=null,liveStatus='idle',liveEnabled=!publicStatic,liveGeneration=0,liveController=null;
 let sectorBundle=null,sectorStatus='loading',sectorDraft=null,sectorGeneration=0;
 let marketBundle=null,marketStatus='loading',marketDraft=null,marketRanges={},marketGeneration=0;
 const uid=()=>crypto.randomUUID();
@@ -66,9 +67,10 @@ function dataPanel(){return `<div class="panel-heading"><div><span class="eyebro
 function helpPanel(){return `<div class="panel-heading"><h1>使用与隐私</h1>${button('close-panel','返回看板','secondary')}</div><section class="card prose"><h2>你的截图，不需要上传</h2><p>截图在浏览器内识别，处理时只下载本站固定的识别程序和模型文件，不向服务器发送截图、文件名、识别文字或持仓。首次识别需要加载本地运行的模型，可能耗时。</p><h2>先核对，再使用</h2><p>当前支持通用表格与带“产品名称 / 持仓金额 / 币种”标签的卡片候选提取。尚未认证任何券商或银行版式。模糊、截断、复杂多列截图可能遗漏或错位，均需人工确认；不能识别时可以手动补录。</p><h2>数字是怎样计算的</h2><p>仅合计当前筛选范围内已确认、名称和币种完整的非负持仓金额。按币种独立统计，不提供自动汇率和历史收益率。未知日期和混合日期都会提示。负资产和待补行不计入；分类只是你的整理标签。</p><h2>本机保存与清除</h2><p>默认仅本次会话使用。主动开启保存后，确认过的快照和布局保存在浏览器数据库；原图与 OCR 原文不会保存。共享设备请谨慎开启，浏览器清理可能删除数据，重要资料请导出。</p><h2>体检依据来自哪里</h2><p>在“目标与体检”填写自己的标准，在持仓编辑中核对流动性和同一资产分组。体检固定使用全部导入资产，不随图表筛选改变。没有设置的项目不会被猜测；没有真实解锁信息时不把受限资产算作当前可用。新旧快照变化可能来自导入范围变化，不等于收益。</p><h2>边界</h2><p>本机存储未加密，不能防止恶意浏览器扩展或已被控制的设备读取。静态托管方可能记录普通访问 IP、时间和资源路径。应用不提供云端同步、交易或投资建议。</p><p>反馈问题前请脱敏，不要提交真实截图、账户信息或备份文件。应用源码采用 MIT；第三方组件和行情另有条件，公开运营仍需另行准备。</p></section>`;}
 function previewDialog(){if(!preview)return '';const old=snapshot?aggregate(snapshot):null,next=aggregate(preview);return `<div class="dialog-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="preview-title" class="dialog"><h2 id="preview-title">确认整组替换</h2><p>原快照 ${snapshot?.holdings.length??0} 条 → 新快照 ${preview.holdings.length} 条。此操作不保存历史版本。</p><div class="preview-compare"><div><h3>原已计入金额</h3>${old?.currencies.map(c=>`<p>${money(c.total,c.currency)}</p>`).join('')||'无'}</div><div><h3>新已计入金额</h3>${next.currencies.map(c=>`<p>${money(c.total,c.currency)}</p>`).join('')||'无'}<p>${next.excluded} 条未计入</p></div></div>${duplicateNotice(preview)}<p class="caption">可能重复的行不会自动合并。请返回核对，删除重复或确认它们是不同账户的持仓。</p><div class="dialog-actions">${button('cancel-preview','返回核对','secondary')}${button('apply','确认替换并生成看板','primary')}</div></section></div>`;}
 function duplicateNotice(s){const groups=new Map();s.holdings.forEach(r=>{const k=[r.name,r.currency,r.marketValue].join('|');groups.set(k,(groups.get(k)||0)+1);});return [...groups.values()].some(n=>n>1)?'<p class="warning">发现名称、币种和金额相同的候选，可能存在截图重叠。请核对后决定是否保留。</p>':'';}
-function currentLiveView(){return renderLiveQuotes(liveBundle,liveStatus,liveEnabled);}
+function currentLiveView(){if(publicStatic)return '<section id="live-market-quotes" class="card" data-public-static><h3>公开试用版 · 盘中行情暂未接入</h3><p>你仍可整理持仓、核对配置并使用个人目标体检。当前没有获准公开分发的行情数据，不提供实时涨跌判断。</p></section>';return renderLiveQuotes(liveBundle,liveStatus,liveEnabled);}
 function updateLiveView(){const section=document.querySelector('#live-market-quotes');if(section)section.outerHTML=currentLiveView();}
 async function loadLiveQuotes(manual=false){
+ if(publicStatic)return;
  if((!liveEnabled&&!manual)||liveStatus==='loading'||document.hidden)return;
  const generation=++liveGeneration;liveStatus='loading';updateLiveView();
  const controller=new AbortController();liveController=controller;const timer=setTimeout(()=>controller.abort(),13000);

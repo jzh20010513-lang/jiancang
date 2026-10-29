@@ -16,7 +16,7 @@
 
 上游 [naptha/tessdata 说明](https://github.com/naptha/tessdata/blob/gh-pages/README.md)说明 `4.0.0_best_int` 是整数化的 tessdata_best，npm 使用该分支文件。[分发仓库 LICENSE](https://github.com/naptha/tessdata/blob/gh-pages/LICENSE)和[模型上游 LICENSE](https://github.com/tesseract-ocr/tessdata_best/blob/main/LICENSE)均已核对、保存在 licenses/。本轮下载的两种上游压缩模型与已安装文件逐字节相同，散列见清单；未据此声称核验了完整训练数据权利链。
 
-`scripts/vendor.mjs` 从锁定安装复制 Worker、core loader/WASM 和两种模型，不使用运行时 CDN。生成的 `vendor/THIRD_PARTY.txt` 汇总当前已安装依赖能取得的 LICENSE/NOTICE/COPYING、Worker 许可旁文件和上游模型许可。不得在分发构建时删去它。该汇总不等于全部原生 WASM 子组件已逐项完成权利审查；打包二进制公开发布前仍须复核上游原生组件和嵌入依赖的完整声明。
+`scripts/vendor.mjs` 从锁定安装复制 Worker、core loader/WASM 和两种模型，不使用运行时 CDN。生成的 `vendor/THIRD_PARTY.txt` 汇总当前已安装依赖能取得的 LICENSE/NOTICE/COPYING、Worker 许可旁文件和上游模型许可。不得在分发构建时删去它。另已按 core v7.0.0 的 third_party 引用补齐 Leptonica、giflib、IJG JPEG、libpng、libtiff、libwebp及专利声明、OpenLibm、Tesseract、zlib，以及 Worker 的 Buffer/ieee754和 Emscripten 声明，见 licenses/native/sources.json。构建附带完整可取得文本和 IJG 致谢。OpenLibm 文档中的 LGPL 段落涉及测试文件，不代表应用改为 LGPL；本工程不分发该项目测试程序。此清单是分发声明核对，不是完整训练数据或法律权利链鉴定。
 
 ## 行情数据独立于代码许可证
 
@@ -29,4 +29,4 @@
 
 ## 发布边界
 
-本轮准备的是不含 `.git`、依赖、模型二进制、浏览器、行情快照和用户资料的源码审阅包。下载者首次安装会从 npm 取得原依赖，首次构建没有行情时只生成不可用状态，不伪造走势。源码开源与运营含行情的网站是不同的发布决定。公众行情服务和二进制整包仍需解决上述授权及声明事项。
+本轮准备的是不含 `.git`、依赖、模型二进制、浏览器、行情快照和用户资料的源码审阅包。下载者首次安装会从 npm 取得原依赖，首次构建没有行情时只生成不可用状态，不伪造走势。源码开源与运营含行情的网站是不同的发布决定。公开静态构建使用 build:public，保留上述运行文件声明，并排除本机行情缓存和盘中行情中转。公众行情服务仍需单独取得适用授权。
